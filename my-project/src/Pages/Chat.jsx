@@ -5,9 +5,7 @@ import sendIcon from "../assets/send.svg";
 import React, { useState, useCallback, useEffect } from 'react';
 function Chat() {
 const [message, setMessage] = useState("");
-let apiKey = "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"
 
-let apiKey2 = "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"
 
 const ApiBody = {
     
