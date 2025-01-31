@@ -33,6 +33,8 @@ async function callOpenAi(){
 }
 
 
+const [chats] = useState([{"chat_id": 2, "Title": "test"}]);
+
 
 
 
@@ -44,7 +46,22 @@ console.log(message)
     <section className="h-[90vh]">
       <div className="flex flex-row w-full h-full">
         <div className="w-1/6 [border-right:2px_solid_gray] flex flex-col items-center py-5">
-          <h3>Chat History</h3>
+          <h3 className="[padding-bottom:20px]">Chat History</h3>
+
+         <div id="TitleContainer" className="w-full flex justify-center">
+         {chats.map((chat) => (
+          <div
+            key={chat.chat_id} 
+            className="[border-top:1px_solid_rgba(255,255,255,0.4)] [border-bottom:1px_solid_rgba(255,255,255,0.4)] py-2 w-full flex justify-center [cursor:pointer] hover:[background-color:rgba(255,255,255,0.1)]"
+            onClick={() => console.log(`Chat with ID: ${chat.chat_id} clicked`)}
+          >
+            {chat.Title}
+          </div>
+        ))}
+         
+         </div>
+
+
         </div>
 
         <div className="w-5/6 flex flex-row justify-center items-end relative">

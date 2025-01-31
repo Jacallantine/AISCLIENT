@@ -188,8 +188,22 @@ img{
 }
 
 nav{
-    background-color: #fdf0d5;
+    /* background-color: #fdf0d5; */
     color: black;
+
+    & > a{
+        display: flex;
+        align-items: center;
+        height: 100%;
+        padding:0 10px;
+        &:hover{
+            background-color: rgba(0, 0, 0, 0.226);
+        }
+
+        & > button:hover{
+            background-color: rgba(0, 0, 0, 0.226);
+        }
+    }
 }
 
 
@@ -242,3 +256,6 @@ span
         top: 50%;
     }
 }
+
+
+

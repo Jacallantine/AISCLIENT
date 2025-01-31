@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom';
 
 function Option()
 {
-return <div className='h-full flex flex-col justify-evenly'>
-<h1 className="[opacity:1] text-5xl 1000-md:text-4xl ">Please Select Your Preference</h1>
-<div className="flex flex-row justify-around ">
+return <div className=' flex flex-col items-center justify-center gap-y-16 h-[75vh] SlideUp '>
+<h1 className="[opacity:1] ">Please Select Your Preference</h1>
+<div className="flex flex-row justify-center w-full gap-x-12 ">
 <Link to="/Chat" className="[opacity:1] Button">
       <span>Guest</span>
     </Link>
