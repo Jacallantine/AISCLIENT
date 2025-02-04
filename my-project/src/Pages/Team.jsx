@@ -43,6 +43,19 @@ function Team()
     </div>
     
     </div>
+
+    <div className="flex flex-row gap-x-20 w-full justify-center bg-slate-500 py-8">
+    
+    <Image img={example}/>
+    <div className="flex flex-col justify-center">
+        <H2 label={"Daniel Douglas"} css={""}></H2>
+
+        <H3 label={"Half Stack Web Developer"}></H3>
+        <P label={""}/>
+    </div>
+    
+    </div>
+     
      
 
   
