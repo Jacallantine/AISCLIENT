@@ -8,6 +8,7 @@ import { useState } from 'react';
 import QuickTips from './QuickTips.jsx';
 import Hamburger from '../Components/Buttons/Hamburger.jsx';
 import NewAccount from './NewAccount.jsx';
+import Team from './Team.jsx';
 
 function AppRouter() {
   const [  slideRightNav, setSlideRightNav] = useState(false);
@@ -54,10 +55,11 @@ function AppRouter() {
           
           <Link to="/LogIn" className="hover:  transition-all duration-300 ease-in-out">Login</Link>
           <Link to ="/QuickTips"  className="  transition-all duration-300 ease-in-out">Quick Tips</Link>
-          <Link to="/LogIn" className="  transition-all duration-300 ease-in-out">Chat</Link>
+          <Link to="/Option" className="  transition-all duration-300 ease-in-out">Chat</Link>
           </>
           
         )}
+        <Link to="/Team" className=" transition-all duration-300 ease-in-out">Team</Link>
         
         
       </nav>
@@ -84,6 +86,7 @@ function AppRouter() {
         <Route path='/Option' element = {<Option/>}/>
         <Route path='/NewAccount' element = {<NewAccount/>}/>
         <Route path="*" element={<Home />} />
+        <Route path="/Team" element={<Team/>}/>
       </Routes>
     </section>
   );

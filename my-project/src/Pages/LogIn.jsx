@@ -27,7 +27,7 @@ function LogIn(){
             Password
         }
         console.log(Body)
-        await fetch("http://localhost:5087/api/Login/Login",{
+        let response = await fetch("http://localhost:5087/api/Login/Login",{
             method: "POST",
             headers:{
                 "Content-Type": "application/json",
@@ -36,13 +36,20 @@ function LogIn(){
         }
     
     
-        ).then((data )=>{
-            return data.json()
-        }).then((data)=> {
-            sessionStorage.setItem("apiLogin", JSON.stringify(data));
-            console.log(data)
-        })
-        // .then(  window.location.href = "/Chat" )
+        )
+        if(response.ok)
+            {
+                let data = await response.json();
+                sessionStorage.setItem("apiLogin", JSON.stringify(data));
+                console.log(data);
+                window.location.href = "/Chat"
+            }
+            else
+            {
+                alert("Incorrect Email/Password")
+            }
+        
+       
     }
 
 
@@ -59,7 +66,7 @@ style={{ backgroundImage: "url('../public/UA.jpg')" }}
 <h3 className="[font-size:32px]">Please Sign In</h3>
 <input type="text" value={Email} placeholder="Email" onChange={(e) => setEmail(e.target.value)}/>
 
-<input type="text" value={Password} placeholder="Password" onChange={(e) => setPassword(e.target.value)}/>
+<input type="password" value={Password} placeholder="Password" onChange={(e) => setPassword(e.target.value)}/>
 
 <div className="flex flex-col gap-y-4">
 <Button2  label="Log In"/>
