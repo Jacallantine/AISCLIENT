@@ -50,7 +50,7 @@ function Team()
     <div className="flex flex-col justify-center">
         <H2 label={"Daniel Douglas"} css={""}></H2>
 
-        <H3 label={"Half Stack Web Developer"}></H3>
+        <H3 label={"Front End Web Developer"}></H3>
         <P label={""}/>
     </div>
     
