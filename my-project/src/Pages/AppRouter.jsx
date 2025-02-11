@@ -9,7 +9,7 @@ import QuickTips from './QuickTips.jsx';
 import Hamburger from '../Components/Buttons/Hamburger.jsx';
 import NewAccount from './NewAccount.jsx';
 import Team from './Team.jsx';
-
+import Logo from "../assets/logo.svg"
 function AppRouter() {
   const [  slideRightNav, setSlideRightNav] = useState(false);
 
@@ -41,8 +41,8 @@ function AppRouter() {
 
   return (
     <section className='z-50'>
-      <nav className="flex gap-x-4 h-[65px] px-32 800-md:hidden bg-white">
-      <Link to="/Home" className=" transition-all duration-300 ease-in-out">Home</Link>
+      <nav className="flex gap-x-4 h-[65px] px-16 800-md:hidden bg-white">
+      <Link to="/Home" className=" transition-all duration-300 ease-in-out flex justify-center"><img src={Logo} alt="" className='[opacity:1] w-5/6 h-5/6' /></Link>
         {user ? (
           <>
           <Link to="/Account" className=" transition-all duration-300 ease-in-out">{user}</Link>

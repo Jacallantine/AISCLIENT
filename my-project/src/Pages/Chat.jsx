@@ -4,6 +4,9 @@ import logo from "../assets/logo.svg";
 import React, { useState } from "react";
 
 function Chat() {
+  const storedUser = sessionStorage.getItem("apiLogin");
+    const user = JSON.parse(storedUser)
+
   const [message, setMessage] = useState("");
   const [chats, setChats] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
@@ -11,40 +14,100 @@ function Chat() {
   function createNewChat() {
     setSelectedChat(null); // Reset view to show empty state
   }
-
-  function callOpenAi() {
+  async function callOpenAi() {
     if (message.trim() === "") return;
   
     const userMessage = message.trim();
     setMessage(""); // Clear input field
   
-    let updatedChats = [...chats];
-    let chatToUpdate = selectedChat;
+    let chatId = selectedChat?.chat_id;
+    let chatTitle = selectedChat ? selectedChat.Title : `Chat ${chats.length + 1}`;
   
-    if (!selectedChat) {
-      // Create a new chat if none is selected
-      chatToUpdate = {
-        chat_id: Date.now(),
-        Title: `Chat ${chats.length + 1}`,
-        messages: [`You: ${userMessage}`], // Start chat with first message
-      };
+    try {
+      // 🔹 Step 1: Call OpenAI API first
+      const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer YOUR_OPENAI_API_KEY`,
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [{ role: "user", content: userMessage }],
+        }),
+      });
   
-      updatedChats = [chatToUpdate, ...chats];
-    } else {
-      // Update the selected chat with the new message
-      chatToUpdate = {
-        ...selectedChat,
-        messages: [...selectedChat.messages, `You: ${userMessage}`],
-      };
+      const data = await aiResponse.json();
+      const botMessage = data.choices[0].message.content;
   
-      updatedChats = updatedChats.map((chat) =>
-        chat.chat_id === chatToUpdate.chat_id ? chatToUpdate : chat
-      );
+      if (!chatId) {
+        // 🔹 Step 2: Create a new chat if one does not exist
+        const chatResponse = await fetch("http://localhost:5087/api/Chat/CreateChat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            Title: chatTitle,
+            datetime: new Date().toISOString()
+          })
+        });
+  
+        if (!chatResponse.ok) throw new Error("Failed to create chat");
+  
+        const chatData = await chatResponse.json();
+        chatId = chatData.chat_id; // Get the new chat ID
+  
+        // Update state with new chat
+        const newChat = {
+          chat_id: chatId,
+          Title: chatTitle,
+          messages: [`You: ${userMessage}`, `AI: ${botMessage}`],
+          datetime: chatData.datetime
+        };
+  
+        setChats([newChat, ...chats]);
+        setSelectedChat(newChat);
+      } else {
+        // 🔹 Step 3: Update existing chat state
+        const updatedChat = {
+          ...selectedChat,
+          messages: [...selectedChat.messages, `You: ${userMessage}`, `AI: ${botMessage}`]
+        };
+  
+        setChats(chats.map(chat => chat.chat_id === chatId ? updatedChat : chat));
+        setSelectedChat(updatedChat);
+      }
+  
+      // 🔹 Step 4: Send messages to Messages table
+      await postMessage(chatId, "user", userMessage);
+      await postMessage(chatId, "AI", botMessage);
+      
+    } catch (error) {
+      console.error("Error:", error);
     }
-  
-    setChats(updatedChats);
-    setSelectedChat(chatToUpdate); // ✅ Ensure selected chat updates with new messages
   }
+  
+  // 🔹 Function to post messages to Messages table
+  async function postMessage(chatId, sender, content) {
+    try {
+      await fetch("http://localhost:5087/api/Message/CreateMessage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          sender: sender,
+          content: content,
+          timestamp: new Date().toISOString()
+        })
+      });
+    } catch (error) {
+      console.error("Error posting message:", error);
+    }
+  }
+  
   
   
 
@@ -52,10 +115,10 @@ function Chat() {
     <section className="h-[90vh]">
       <div className="flex flex-row w-full h-full">
         {/* Sidebar */}
-        <div className="w-1/6 border-r-2 border-gray-700 flex flex-col items-center py-5 800-md:hidden">
+        <div className="w-1/6 border-r-2 border-gray-700 bg-gray-800 flex flex-col items-center py-5 800-md:hidden">
           <h3 className="pb-3">Chat History</h3>
           <h4
-            className="text-lg cursor-pointer hover:bg-gray-700 w-full text-center py-2"
+            className="text-lg cursor-pointer hover:bg-gray-700 w-full text-center py-2 [border-top:1px_solid_white] [border-bottom:1px_solid_rgba(255,255,255,0.6)] "
             onClick={createNewChat} // Resets the view but doesn't create a chat yet
           >
             New Chat
@@ -64,7 +127,7 @@ function Chat() {
             {chats.map((chat) => (
               <div
                 key={chat.chat_id}
-                className={`py-2 w-full text-center cursor-pointer hover:bg-gray-700 ${
+                className={`py-2 w-full text-center cursor-pointer [border-bottom:1px_solid_rgba(255,255,255,0.6)]   hover:bg-gray-700 ${
                   selectedChat?.chat_id === chat.chat_id ? "bg-gray-600" : ""
                 }`}
                 onClick={() => setSelectedChat(chat)}
@@ -94,7 +157,7 @@ function Chat() {
           </div>
 
           {/* Input */}
-          <div className="flex flex-row items-center gap-x-5 w-full px-5 py-3">
+          <div className="flex flex-row items-center gap-x-5 w-2/6 px-5 py-3">
             <textarea
               id="question"
               value={message}
@@ -102,12 +165,18 @@ function Chat() {
               className="h-fit text-white w-full max-h-20 bg-gray-800 rounded-md placeholder-white p-3 resize-none"
               placeholder="Message UniScout"
             />
-            <button
-              className="p-2 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center w-10 h-10"
+            
+            <div
+              className={`p-2 rounded-[20px] bg-[rgba(32,32,32,1)] overflow-hidden flex items-center justify-center w-10 h-10 hover:bg-[rgba(255,255,255,0.1)]`}
               onClick={callOpenAi}
+             
             >
-              <img src={sendIcon} alt="Send" className="w-6 h-6" />
-            </button>
+              <img
+                src={sendIcon}
+                alt="Send Icon"
+                className="object-contain max-w-full max-h-full [opacity:1] [cursor:pointer]"
+              />
+            </div>
           </div>
         </div>
       </div>

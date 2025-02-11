@@ -20,7 +20,7 @@ const click = () =>
   return (
     <Section75 css={"flex flex-col justify-center items-center gap-y-16"}>
     
-    <H1 label={"Welcome to UniScout"} />
+    <H1 label={"Welcome to UniScout"}  css={"SlideUp"}/>
     <Button3 label={"Need Help?"} onClick={click}/>
     
     </Section75>
