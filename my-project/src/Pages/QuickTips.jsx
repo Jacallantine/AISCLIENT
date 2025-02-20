@@ -12,7 +12,7 @@ function QuickTips()
         const [isOpen, setIsOpen] = useState(false);
         const [isOpen2, setIsOpen2] = useState(false);
 
-    return <Section100 css={"flex flex-col justify-center items-center"}>
+    return <Section100 css={"flex flex-col justify-center items-center h-fit gap-y-4"}>
     <H1 label={"Quick Tips"}/>
     
     <div onClick={()=>setIsOpen(!isOpen)} className="flex flex-col w-2/3 h-fit gap-y-6 bg-blue-900 hover:bg-blue-800 [transition:300ms] py-6 px-4 [cursor:pointer] [border:2px_solid_gray] ">

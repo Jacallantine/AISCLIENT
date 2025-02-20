@@ -4,8 +4,22 @@ import logo from "../assets/logo.svg";
 import React, { useState } from "react";
 
 function Chat() {
+  
+  function guid() {
+    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+      (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+    );
+  }
+  
   const storedUser = sessionStorage.getItem("apiLogin");
     const user = JSON.parse(storedUser)
+    React.useEffect(() => {
+      if (user?.AccountId) {
+        getChats();
+      }
+    }, [user?.AccountId]);
+
+    let apikey = ''
 
   const [message, setMessage] = useState("");
   const [chats, setChats] = useState([]);
@@ -13,6 +27,33 @@ function Chat() {
 
   function createNewChat() {
     setSelectedChat(null); // Reset view to show empty state
+  }
+
+ 
+  async function getChats(){
+
+const getChatResp = await fetch("http://localhost:5087/api/Chat/GetChats",{
+  method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({AccountId : user.AccountId})
+  })
+  
+  
+  if(getChatResp.ok)
+  {
+    const data = await getChatResp.json()
+    console.log("it worked")
+    console.log(data)
+    setChats(data);
+  }
+  else{
+    console.log('it failed')
+  }
+        
+
+
   }
   async function callOpenAi() {
     if (message.trim() === "") return;
@@ -29,7 +70,7 @@ function Chat() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer YOUR_OPENAI_API_KEY`,
+          "Authorization": `Bearer ${apikey}`,
         },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
@@ -40,27 +81,28 @@ function Chat() {
       const data = await aiResponse.json();
       const botMessage = data.choices[0].message.content;
   
-      if (!chatId) {
+      if (!chatId && !selectedChat) {
         // 🔹 Step 2: Create a new chat if one does not exist
-        const chatResponse = await fetch("http://localhost:5087/api/Chat/CreateChat", {
+        const chatResponse = await fetch("http://localhost:5087/api/Chat/NewChat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
             Title: chatTitle,
-            datetime: new Date().toISOString()
+            ChatId : guid(),
+            AccountId: user.AccountId,
+            Time: new Date().toISOString()
           })
         });
   
-        if (!chatResponse.ok) throw new Error("Failed to create chat");
   
-        const chatData = await chatResponse.json();
-        chatId = chatData.chat_id; // Get the new chat ID
+        const chatData = await chatResponse.json;
+        chatId = chatData.ChatId; // Get the new chat ID
   
         // Update state with new chat
         const newChat = {
-          chat_id: chatId,
+          ChatId: chatId,
           Title: chatTitle,
           messages: [`You: ${userMessage}`, `AI: ${botMessage}`],
           datetime: chatData.datetime
@@ -91,16 +133,16 @@ function Chat() {
   // 🔹 Function to post messages to Messages table
   async function postMessage(chatId, sender, content) {
     try {
-      await fetch("http://localhost:5087/api/Message/CreateMessage", {
+      await fetch("http://localhost:5087/api/Chat/NewMessage", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          chat_id: chatId,
+          ChatId: chatId,
           sender: sender,
           content: content,
-          timestamp: new Date().toISOString()
+          Time: new Date().toISOString()
         })
       });
     } catch (error) {
@@ -119,7 +161,7 @@ function Chat() {
           <h3 className="pb-3">Chat History</h3>
           <h4
             className="text-lg cursor-pointer hover:bg-gray-700 w-full text-center py-2 [border-top:1px_solid_white] [border-bottom:1px_solid_rgba(255,255,255,0.6)] "
-            onClick={createNewChat} // Resets the view but doesn't create a chat yet
+            onClick={createNewChat} 
           >
             New Chat
           </h4>
@@ -157,7 +199,7 @@ function Chat() {
           </div>
 
           {/* Input */}
-          <div className="flex flex-row items-center gap-x-5 w-2/6 px-5 py-3">
+          <div className="flex flex-row items-center gap-x-5 w-2/6 1000-md:2/3 px-5 py-3 800-md:w-2/3">
             <textarea
               id="question"
               value={message}

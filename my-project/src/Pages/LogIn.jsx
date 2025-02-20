@@ -55,7 +55,7 @@ function LogIn(){
 
 
 
-return <section className="relative h-[100vh] flex justify-center py-52 [background-repeat:no-repeat] [background-size:cover] [background-position:center] [z-index:1] 800-md:[background-size:cover] 800-md:py-24"
+return <section className="relative h-[100vh] flex justify-center py-52 [background-repeat:no-repeat] [background-size:cover] [background-position:center] [z-index:1] 800-md:[background-size:cover] 700-hmd:py-24 800-md:py-24"
 style={{ backgroundImage: "url('../public/UA.jpg')" }}
 >
 
